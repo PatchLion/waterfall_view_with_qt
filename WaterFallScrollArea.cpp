@@ -1,5 +1,6 @@
 #include "WaterFallScrollArea.h"
 #include "WaterFallWidget.h"
+#include "ImageSreachThread.h"
 
 CWaterFallScrollArea::CWaterFallScrollArea(QWidget* parant /*= 0*/)
 	: QScrollArea(parant)
@@ -14,6 +15,8 @@ CWaterFallScrollArea::CWaterFallScrollArea(QWidget* parant /*= 0*/)
 
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	setAcceptDrops(true);
 }
 
 void CWaterFallScrollArea::resizeEvent(QResizeEvent *event)
@@ -31,11 +34,15 @@ void CWaterFallScrollArea::onVerticalBarRangeChanged(int min, int max)
 void CWaterFallScrollArea::onVerticalBarValueChanged(int value)
 {
 	qDebug() << QString("value moved: %1").arg(value);
-
+	Q_ASSERT(m_content);
 	if (value >= (verticalScrollBar()->maximum() - 5))
 	{
-		Q_ASSERT(m_content);
+		
 		m_content->onScrollToBottom(height());
+	}
+	else if (value <= 5)
+	{
+		m_content->onScrollToTop(height());
 	}
 }
 
@@ -43,5 +50,40 @@ void CWaterFallScrollArea::setImageList(const QStringList& listImagePath)
 {
 	Q_ASSERT(m_content);
 	m_content->setImageList(listImagePath);
+}
+
+void CWaterFallScrollArea::dropEvent(QDropEvent *event)
+{
+	setEnabled(false);
+	if (event->mimeData()->hasUrls())
+	{
+		QList<QUrl> urls = event->mimeData()->urls();
+		if (!urls.isEmpty())
+		{
+			QStringList paths;
+			for (int i = 0; i < urls.size(); i++	)
+			{
+				if (urls[i].isLocalFile())
+				{
+					QEventLoop loop;
+					CImageSreachThread sreachThread;
+					connect(&sreachThread, &CImageSreachThread::finished, &loop, &QEventLoop::quit);
+					sreachThread.setRootPath(urls[i].toLocalFile());
+					sreachThread.start();
+					loop.exec();
+
+					paths.append(sreachThread.fileList());
+				}
+			}
+
+			setImageList(paths);
+		}
+	}
+	setEnabled(true);
+}
+
+void CWaterFallScrollArea::dragEnterEvent(QDragEnterEvent *event)
+{
+	event->accept();
 }
 

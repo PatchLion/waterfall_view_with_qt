@@ -36,12 +36,14 @@ void CWaterFallItem::paintEvent(QPaintEvent *event)
 	if (m_isDumped)
 	{
 		QEventLoop loop;
-		CImageLoadThread loadThread;
+		/*CImageLoadThread loadThread;
 		loadThread.setImagePath(m_dumpedPath);
 		connect(&loadThread, &CImageLoadThread::finished, &loop, &QEventLoop::quit);
+		loadThread.start();
 		loop.exec();
 		Q_ASSERT(loadThread.isSuccessed());
-		m_thumb = QPixmap::fromImage(loadThread.image());
+		m_thumb = QPixmap::fromImage(loadThread.image());*/
+		m_thumb.load(m_dumpedPath);
 		qDebug() << "Reload image --> " << m_dumpedPath << m_thumb.width() << " " << m_thumb.height();
 		m_isDumped = false;
 		removeDumpFile();
@@ -86,7 +88,9 @@ void CWaterFallItem::dump()
 		QEventLoop loop;
 		CImageSaveThread saveThread;
 		connect(&saveThread, &CImageSaveThread::finished, &loop, &QEventLoop::quit);
-		saveThread.setImagePath(m_dumpedPath, &m_thumb.toImage());
+		QImage tempImage = m_thumb.toImage();
+		saveThread.setImagePath(m_dumpedPath, &tempImage);
+		saveThread.start();
 		loop.exec();
 		Q_ASSERT(saveThread.isSuccessed());
 		m_thumb = QPixmap();

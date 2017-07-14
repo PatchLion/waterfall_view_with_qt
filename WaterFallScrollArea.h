@@ -16,6 +16,8 @@ public:
 
 protected:
 	void resizeEvent(QResizeEvent *event);
+	void dropEvent(QDropEvent *event);
+	void dragEnterEvent(QDragEnterEvent *event);
 
 protected Q_SLOTS:
 	void onVerticalBarRangeChanged(int min, int max);

@@ -25,13 +25,15 @@ public:
 	static QSize fixedSizeWithWidth(const QSize& imageSize, int width);
 
 private:
+	void onScrollToTop(int scrollareaHeight);
 	void onScrollToBottom(int scrollareaHeight);
 	void resetHeights();
+	void releaseItems();
 
 protected:
 	void paintEvent(QPaintEvent *event);
 
-	void pushImagePathToLoad(int count = 4);
+	void pushImagePathToLoad(int count = 8);
 
 	void refreshItems();
 	void appendItem(CWaterFallItem* item);
@@ -42,7 +44,8 @@ protected:
 
 	void resetWidgetFixedHeight();
 
-	void tryToDumpItem(int size);
+	void tryToDumpTopItem(int size);
+	void tryToDumpBottomItem(int size);
 protected Q_SLOTS:
 	void onImageLoaded(const QPixmap& image, const QString& originpath);
 

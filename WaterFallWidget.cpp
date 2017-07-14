@@ -12,18 +12,17 @@ CWaterFallWidget::CWaterFallWidget(QWidget* parent /*= 0*/)
 	: QWidget(parent)
 {
 	connect(&m_loadThread, &CImageLoadThreadManager::imageLoadFinished, this, &CWaterFallWidget::onImageLoaded, Qt::QueuedConnection);
-	m_loadThread.start();
 
 	resetHeights();
 }
 
 void CWaterFallWidget::paintEvent(QPaintEvent *event)
 {
-	QPainter painter(this);
+	/*QPainter painter(this);
 	painter.setPen(Qt::red);
 	painter.setBrush(Qt::lightGray);
 
-	painter.drawRect(rect().adjusted(0, 0, -1, -1));
+	painter.drawRect(rect().adjusted(0, 0, -1, -1));*/
 }
 
 void CWaterFallWidget::onScrollToBottom(int scrollareaHeight)
@@ -32,7 +31,9 @@ void CWaterFallWidget::onScrollToBottom(int scrollareaHeight)
 
 	pushImagePathToLoad();
 
-	tryToDumpItem(scrollareaHeight * 2.5);
+	tryToDumpTopItem(scrollareaHeight * 2.5);
+
+	update();
 }
 
 QSize CWaterFallWidget::fixedSizeWithWidth(const QSize& imageSize, int width)
@@ -47,9 +48,31 @@ QSize CWaterFallWidget::fixedSizeWithWidth(const QSize& imageSize, int width)
 
 void CWaterFallWidget::setImageList(const QStringList& listImagePath)
 {
+	releaseItems();
+	m_loadThread.stopAndClear();
+	m_loadThread.start();
+	QThread::msleep(200);
+	refreshItems();
+	update();
 	m_listImagePath = listImagePath;
 	pushImagePathToLoad(15);
 }
+
+
+void CWaterFallWidget::releaseItems()
+{
+	for (int i = 0; i < kColumnSize; i++)
+	{
+		Q_FOREACH(CWaterFallItem* item, m_listItemsWithColumn[i])
+		{
+			delete item;
+			item = 0;
+		}
+
+		m_listItemsWithColumn[i].clear();
+	}
+}
+
 void CWaterFallWidget::onImageLoaded(const QPixmap& image, const QString& originpath)
 {
 	if (!image.isNull())
@@ -168,11 +191,31 @@ void CWaterFallWidget::resetWidgetFixedHeight()
 
 CWaterFallWidget::~CWaterFallWidget()
 {
-	m_loadThread.quit();
-	m_loadThread.wait();
+	
 }
 
-void CWaterFallWidget::tryToDumpItem(int size)
+void CWaterFallWidget::tryToDumpBottomItem(int size)
+{
+	if (size > 0)
+	{
+		for (int i = 0; i < kColumnSize; i++)
+		{
+			QList<CWaterFallItem*> listItem = m_listItemsWithColumn[i];
+			Q_FOREACH(CWaterFallItem* item, listItem)
+			{
+				QRect itemRect = item->geometry();
+				QRect scrollAreaRect(0, 0, width(), size);
+
+				if (!itemRect.intersects(scrollAreaRect))
+				{
+					item->dump();
+				}
+			}
+		}
+	}
+}
+
+void CWaterFallWidget::tryToDumpTopItem(int size)
 {
 	if (size > 0)
 	{
@@ -192,4 +235,11 @@ void CWaterFallWidget::tryToDumpItem(int size)
 		}
 	}
 
+}
+
+void CWaterFallWidget::onScrollToTop(int scrollareaHeight)
+{
+	tryToDumpBottomItem(scrollareaHeight * 2.5);
+
+	update();
 }

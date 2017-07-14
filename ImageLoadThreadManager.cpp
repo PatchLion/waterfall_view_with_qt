@@ -9,6 +9,7 @@ CImageLoadThreadManager::CImageLoadThreadManager(QObject* object /*= 0*/)
 
 void CImageLoadThreadManager::run()
 {
+	m_quit = false;
 	while (!m_quit)
 	{
 		if (!m_listImagePath.isEmpty())
@@ -40,5 +41,17 @@ void CImageLoadThreadManager::quit()
 {
 	m_quit = true;
 	QThread::quit();
+}
+
+void CImageLoadThreadManager::stopAndClear()
+{	
+	m_listImagePath.clear();
+	quit();
+	wait();
+}
+
+CImageLoadThreadManager::~CImageLoadThreadManager()
+{
+	stopAndClear();
 }
 

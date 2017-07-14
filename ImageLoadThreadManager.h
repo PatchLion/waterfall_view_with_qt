@@ -10,11 +10,14 @@ class CImageLoadThreadManager : public QThread
 	Q_OBJECT
 public:
 	CImageLoadThreadManager(QObject* object = 0);
+	~CImageLoadThreadManager();
 
 public:
 	void appendImagePath(const QString& path) { m_listImagePath.append(path); }
 
 	void quit();
+
+	void stopAndClear();
 
 protected:
 	void run();
