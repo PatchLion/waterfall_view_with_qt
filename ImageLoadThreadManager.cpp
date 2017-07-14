@@ -22,7 +22,7 @@ void CImageLoadThreadManager::run()
 				QImage image;
 				if (reader.read(&image))
 				{
-					const int kLimitSize = 400;
+					const int kLimitSize = 500;
 					if (image.width() > kLimitSize || image.height() > kLimitSize)
 					{
 						image = image.scaled(kLimitSize, kLimitSize, Qt::KeepAspectRatio);

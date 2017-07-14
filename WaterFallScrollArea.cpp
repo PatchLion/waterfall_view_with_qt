@@ -35,7 +35,7 @@ void CWaterFallScrollArea::onVerticalBarValueChanged(int value)
 	if (value >= (verticalScrollBar()->maximum() - 5))
 	{
 		Q_ASSERT(m_content);
-		m_content->onScrollToBottom();
+		m_content->onScrollToBottom(height());
 	}
 }
 
@@ -43,10 +43,5 @@ void CWaterFallScrollArea::setImageList(const QStringList& listImagePath)
 {
 	Q_ASSERT(m_content);
 	m_content->setImageList(listImagePath);
-}
-
-void CWaterFallScrollArea::onImageThumbLoaded(const QPixmap& pixmap)
-{
-
 }
 

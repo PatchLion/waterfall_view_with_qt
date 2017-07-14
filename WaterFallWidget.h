@@ -25,7 +25,7 @@ public:
 	static QSize fixedSizeWithWidth(const QSize& imageSize, int width);
 
 private:
-	void onScrollToBottom();
+	void onScrollToBottom(int scrollareaHeight);
 	void resetHeights();
 
 protected:
@@ -42,13 +42,13 @@ protected:
 
 	void resetWidgetFixedHeight();
 
+	void tryToDumpItem(int size);
 protected Q_SLOTS:
 	void onImageLoaded(const QPixmap& image, const QString& originpath);
 
 private:
 	QStringList m_listImagePath;
 	CImageLoadThreadManager m_loadThread;
-
 	int m_heights[kColumnSize]; //
 	QList<CWaterFallItem*> m_listItemsWithColumn[kColumnSize];
 	//QList<CWaterFallItem*> m_listItem;

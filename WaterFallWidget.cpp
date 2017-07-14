@@ -26,11 +26,13 @@ void CWaterFallWidget::paintEvent(QPaintEvent *event)
 	painter.drawRect(rect().adjusted(0, 0, -1, -1));
 }
 
-void CWaterFallWidget::onScrollToBottom()
+void CWaterFallWidget::onScrollToBottom(int scrollareaHeight)
 {
 	qDebug() << "scroll to bottom......";
 
 	pushImagePathToLoad();
+
+	tryToDumpItem(scrollareaHeight * 2.5);
 }
 
 QSize CWaterFallWidget::fixedSizeWithWidth(const QSize& imageSize, int width)
@@ -56,6 +58,7 @@ void CWaterFallWidget::onImageLoaded(const QPixmap& image, const QString& origin
 
 		appendItem(item);
 	}
+
 }
 
 void CWaterFallWidget::pushImagePathToLoad(int count)
@@ -83,7 +86,7 @@ void CWaterFallWidget::refreshItems()
 		for (int x = 0; x < listItems.size(); x++)
 		{
 			CWaterFallItem* item = listItems[x];
-			const QSize size = fixedSizeWithWidth(item->thumb().size(), kUnitWidth);
+			const QSize size = fixedSizeWithWidth(item->imageSize(), kUnitWidth);
 
 			item->setGeometry(posx, m_heights[i], size.width(), size.height());
 			item->setVisible(true);
@@ -124,7 +127,7 @@ void CWaterFallWidget::appendItem(CWaterFallItem* item)
 	}
 	const int kUnitWidth = unitWidth();
 	const int posx = kLeftSpacing + index * (kUnitWidth + kHSpacing);
-	const QSize size = fixedSizeWithWidth(item->thumb().size(), kUnitWidth);
+	const QSize size = fixedSizeWithWidth(item->imageSize(), kUnitWidth);
 	item->setGeometry(posx, minHeight + kVSpacing, size.width(), size.height());
 	item->setVisible(true);
 
@@ -167,4 +170,26 @@ CWaterFallWidget::~CWaterFallWidget()
 {
 	m_loadThread.quit();
 	m_loadThread.wait();
+}
+
+void CWaterFallWidget::tryToDumpItem(int size)
+{
+	if (size > 0)
+	{
+		for (int i = 0; i < kColumnSize; i++)
+		{
+			QList<CWaterFallItem*> listItem = m_listItemsWithColumn[i];
+			Q_FOREACH(CWaterFallItem* item, listItem)
+			{
+				QRect itemRect = item->geometry();
+				QRect scrollAreaRect(0, height() - size, width(), size);
+
+				if (!itemRect.intersects(scrollAreaRect))
+				{
+					item->dump();
+				}
+			}
+		}
+	}
+
 }

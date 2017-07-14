@@ -4,6 +4,7 @@
 #include <QtCore>
 #include <QtGui>
 
+//Note: ¼ÓÔØµÄÊÇËõÂÔÍ¼
 class CImageLoadThreadManager : public QThread
 {
 	Q_OBJECT

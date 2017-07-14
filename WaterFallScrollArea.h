@@ -20,8 +20,7 @@ protected:
 protected Q_SLOTS:
 	void onVerticalBarRangeChanged(int min, int max);
 	void onVerticalBarValueChanged(int value);
-	void onImageThumbLoaded(const QPixmap& pixmap);
-
+	
 
 private:
 	CWaterFallWidget* m_content;
