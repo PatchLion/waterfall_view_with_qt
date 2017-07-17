@@ -3,7 +3,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "ImageLoadThreadManager.h"
+#include "ImageReadQueue.h"
 
 #define kColumnSize 4 
 
@@ -47,11 +47,11 @@ protected:
 	void tryToDumpTopItem(int size);
 	void tryToDumpBottomItem(int size);
 protected Q_SLOTS:
-	void onImageLoaded(const QPixmap& image, const QString& originpath);
+void onImageLoaded(const QString& taskID, bool success, const QImage& image, const ImageLib::stReadParam& param);
 
 private:
 	QStringList m_listImagePath;
-	CImageLoadThreadManager m_loadThread;
+	ImageLib::CImageReadQueue m_loadThread;
 	int m_heights[kColumnSize]; //
 	QList<CWaterFallItem*> m_listItemsWithColumn[kColumnSize];
 	//QList<CWaterFallItem*> m_listItem;

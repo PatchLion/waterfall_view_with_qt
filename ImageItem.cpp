@@ -1,11 +1,12 @@
 #include "ImageItem.h"
 #include <QFontMetrics>
 
-CImageItem::CImageItem(const QString& path, QWidget* parent /*= 0*/)
+CImageItem::CImageItem(const QUrl& url, QWidget* parent /*= 0*/)
 	: QDialog(parent)
 	, m_isLoading(true)
 {
-	m_imageLoadThread.setImagePath(path);
+	ImageLib::stReadParam param(url);
+	m_imageLoadThread.setParam(param);
 	connect(&m_imageLoadThread, &QThread::finished, this, &CImageItem::onImageLoaded);
 
 	setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
@@ -56,7 +57,7 @@ void CImageItem::showEvent(QShowEvent *event)
 
 void CImageItem::onImageLoaded()
 {
-	m_isLoading = !(m_imageLoadThread.isSuccessed() && !m_imageLoadThread.image().isNull());
+	m_isLoading = !(m_imageLoadThread.result().isSuccess && !m_imageLoadThread.image().isNull());
 	update();
 }
 

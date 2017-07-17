@@ -11,7 +11,7 @@
 CWaterFallWidget::CWaterFallWidget(QWidget* parent /*= 0*/)
 	: QWidget(parent)
 {
-	connect(&m_loadThread, &CImageLoadThreadManager::imageLoadFinished, this, &CWaterFallWidget::onImageLoaded, Qt::QueuedConnection);
+	connect(&m_loadThread, &ImageLib::CImageReadQueue::loadFinished, this, &CWaterFallWidget::onImageLoaded, Qt::QueuedConnection);
 
 	resetHeights();
 }
@@ -49,8 +49,8 @@ QSize CWaterFallWidget::fixedSizeWithWidth(const QSize& imageSize, int width)
 void CWaterFallWidget::setImageList(const QStringList& listImagePath)
 {
 	releaseItems();
-	m_loadThread.stopAndClear();
-	m_loadThread.start();
+	//m_loadThread.stopAndClear();
+	//m_loadThread.start();
 	QThread::msleep(200);
 	refreshItems();
 	update();
@@ -73,11 +73,11 @@ void CWaterFallWidget::releaseItems()
 	}
 }
 
-void CWaterFallWidget::onImageLoaded(const QPixmap& image, const QString& originpath)
+void CWaterFallWidget::onImageLoaded(const QString& taskID, bool success, const QImage& image, const ImageLib::stReadParam& param)
 {
 	if (!image.isNull())
 	{
-		CWaterFallItem* item = new CWaterFallItem(image, originpath, this);
+		CWaterFallItem* item = new CWaterFallItem(QPixmap::fromImage(image), param.fileUrl, this);
 
 		appendItem(item);
 	}
@@ -90,7 +90,8 @@ void CWaterFallWidget::pushImagePathToLoad(int count)
 	{
 		const QString path = m_listImagePath.takeFirst();
 
-		m_loadThread.appendImagePath(path);
+		ImageLib::stReadParam param(path, true, 500);
+		m_loadThread.addLoadTask(param);
 	}
 }
 
