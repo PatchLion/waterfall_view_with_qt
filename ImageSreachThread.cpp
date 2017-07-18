@@ -11,7 +11,10 @@ void CImageSreachThread::run()
 {
 	m_isSuccessed = false;
 
-	imageFilePaths(m_rootPath, m_fileList);
+	Q_FOREACH(QString root, m_rootPaths)
+	{
+		imageFilePaths(root, m_fileList);
+	}
 
 	 m_isSuccessed = true;
 	
@@ -25,6 +28,8 @@ void CImageSreachThread::imageFilePaths(const QString& root, QStringList& paths)
 
 	QDir dir(root);
 	QFileInfoList listFileInfo = dir.entryInfoList();
+
+	QStringList listTemp;
 
 	Q_FOREACH(QFileInfo fileInfo, listFileInfo)
 	{
@@ -43,9 +48,14 @@ void CImageSreachThread::imageFilePaths(const QString& root, QStringList& paths)
 			if (m_fileSuffixes.contains(fileInfo.suffix().trimmed().toLower()))
 			{
 				paths.append(fileInfo.absoluteFilePath());
+				listTemp << fileInfo.absoluteFilePath();
 			}
 		}
 	}
 
+	if (!listTemp.isEmpty())
+	{
+		readProgress(listTemp);
+	}
 }
 

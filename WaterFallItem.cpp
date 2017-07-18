@@ -53,6 +53,35 @@ void CWaterFallItem::paintEvent(QPaintEvent *event)
 		QPainter painter(this);
 		QRect r = m_isHovering ? rect() : rect().adjusted(3, 3, -3, -3);
 		painter.drawPixmap(r, m_thumb);
+
+		QColor color(0, 0, 0, 130);
+		painter.setPen(color);
+		painter.setBrush(color);
+
+		const int kHeight = 36;
+
+		QRect bgRect(0, height() - kHeight, width(), kHeight);
+		painter.drawRect(bgRect);
+
+		painter.setPen(Qt::white);
+		painter.setBrush(Qt::white);
+
+		QFont f = font();
+		f.setPixelSize(14);
+		f.setFamily(QString::fromLocal8Bit("Î¢ÈíÑÅºÚ"));
+		painter.setFont(f);
+		QFontMetrics fontM(f);
+
+		QStringList temp = m_imageUrl.toString().split('/');
+		QString text = temp[temp.size() - 2];
+		const int kLimitSize = 12;
+		if (text.size() > kLimitSize)
+		{
+			text = text.mid(0, kLimitSize) + "...";
+		}
+		QRect textRect = fontM.boundingRect(text);
+
+		painter.drawText(bgRect.center().x() - textRect.width() / 2.0, bgRect.center().y() + textRect.height()/3.0, text);
 	}
 }
 
@@ -70,7 +99,8 @@ void CWaterFallItem::leaveEvent(QEvent *event)
 
 void CWaterFallItem::mousePressEvent(QMouseEvent *event)
 {
-	CImageItem imageItem(m_imageUrl);
+	CImageItem imageItem(m_imageUrl, this);
+	imageItem.showMaximized();
 	imageItem.exec();
 }
 

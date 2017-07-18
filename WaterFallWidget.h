@@ -21,6 +21,7 @@ public:
 	~CWaterFallWidget();
 
 public:
+	void appendImageList(const QStringList& listImagePath);
 	void setImageList(const QStringList& listImagePath);
 	static QSize fixedSizeWithWidth(const QSize& imageSize, int width);
 
@@ -33,7 +34,7 @@ private:
 protected:
 	void paintEvent(QPaintEvent *event);
 
-	void pushImagePathToLoad(int count = 8);
+	void pushImagePathToLoad(int count = 15);
 
 	void refreshItems();
 	void appendItem(CWaterFallItem* item);

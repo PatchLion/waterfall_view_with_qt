@@ -29,10 +29,15 @@ void CWaterFallWidget::onScrollToBottom(int scrollareaHeight)
 {
 	qDebug() << "scroll to bottom......";
 
-	pushImagePathToLoad();
+	if (m_loadThread.isAllTaskFinished())
+	{
+		pushImagePathToLoad();
 
-	tryToDumpTopItem(scrollareaHeight * 2.5);
 
+		tryToDumpTopItem(scrollareaHeight * 2.5);
+
+	}
+	
 	update();
 }
 
@@ -44,6 +49,16 @@ QSize CWaterFallWidget::fixedSizeWithWidth(const QSize& imageSize, int width)
 	}
 
 	return QSize(width, (double)width * (double)imageSize.height() / (double)imageSize.width());
+}
+
+void CWaterFallWidget::appendImageList(const QStringList& listImagePath)
+{
+	m_listImagePath << listImagePath;
+
+	if (m_loadThread.isAllTaskFinished())
+	{
+		pushImagePathToLoad(15);
+	}
 }
 
 void CWaterFallWidget::setImageList(const QStringList& listImagePath)

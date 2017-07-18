@@ -4,14 +4,15 @@
 CImageItem::CImageItem(const QUrl& url, QWidget* parent /*= 0*/)
 	: QDialog(parent)
 	, m_isLoading(true)
+	, m_scale(1.0)
 {
 	ImageLib::stReadParam param(url);
 	m_imageLoadThread.setParam(param);
 	connect(&m_imageLoadThread, &QThread::finished, this, &CImageItem::onImageLoaded);
 
-	setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
+	setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint | Qt::FramelessWindowHint);
 
-	resize(800, 600);
+	//resize(1024, 768);
 }
 
 
@@ -40,7 +41,7 @@ void CImageItem::paintEvent(QPaintEvent *event)
 	}
 	else
 	{
-		QImage temp = m_imageLoadThread.image().scaled(size(), Qt::KeepAspectRatio);
+		QImage temp = m_imageLoadThread.image().scaled(size() * m_scale, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		painter.drawImage(QRect(rect().center().x() - temp.width() / 2, rect().center().y() - temp.height() / 2, 
 			temp.width(), temp.height()), m_imageLoadThread.image());
 	}
@@ -58,6 +59,33 @@ void CImageItem::showEvent(QShowEvent *event)
 void CImageItem::onImageLoaded()
 {
 	m_isLoading = !(m_imageLoadThread.result().isSuccess && !m_imageLoadThread.image().isNull());
+	update();
+}
+
+void CImageItem::mousePressEvent(QMouseEvent *event)
+{
+	close();
+}
+
+const int kMinScale = 0.1;
+const int kMaxScale = 3.0;
+void CImageItem::wheelEvent(QWheelEvent *event)
+{
+	const int i = event->delta() / 120;
+
+	m_scale = m_scale - i * 0.05;
+
+	if (m_scale < kMinScale)
+	{
+		m_scale = kMinScale;
+	}
+	else if (m_scale > kMaxScale)
+	{
+		m_scale = kMaxScale;
+	}
+
+	qDebug() << "scale -->" << m_scale;
+	
 	update();
 }
 

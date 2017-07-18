@@ -15,6 +15,8 @@ public:
 protected:
 	void paintEvent(QPaintEvent *event);
 	void showEvent(QShowEvent *event);
+	void mousePressEvent(QMouseEvent *event);
+	void wheelEvent(QWheelEvent *event);
 
 protected Q_SLOTS:
 	void onImageLoaded();
@@ -22,6 +24,7 @@ protected Q_SLOTS:
 private:
 	ImageLib::CImageReadThread m_imageLoadThread;
 	bool m_isLoading;
+	double m_scale;
 };
 
 #endif // ImageItem_h__
