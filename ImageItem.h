@@ -9,7 +9,7 @@ class CImageItem : public QDialog
 {
 	Q_OBJECT
 public:
-	CImageItem(const QUrl& path, QWidget* parent = 0);
+	CImageItem(const QString& path, bool isLocalFile, QWidget* parent = 0);
 
 
 protected:

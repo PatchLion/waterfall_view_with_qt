@@ -10,6 +10,7 @@
 
 CWaterFallWidget::CWaterFallWidget(QWidget* parent /*= 0*/)
 	: QWidget(parent)
+	, m_isInit(true)
 {
 	connect(&m_loadThread, &ImageLib::CImageReadQueue::loadFinished, this, &CWaterFallWidget::onImageLoaded, Qt::QueuedConnection);
 
@@ -29,12 +30,12 @@ void CWaterFallWidget::onScrollToBottom(int scrollareaHeight)
 {
 	qDebug() << "scroll to bottom......";
 
-	if (m_loadThread.isAllTaskFinished())
+	if (m_loadThread.isAllFinished())
 	{
 		pushImagePathToLoad();
 
 
-		tryToDumpTopItem(scrollareaHeight * 2.5);
+		tryToDumpTopItem(scrollareaHeight * 1.5);
 
 	}
 	
@@ -55,14 +56,16 @@ void CWaterFallWidget::appendImageList(const QStringList& listImagePath)
 {
 	m_listImagePath << listImagePath;
 
-	if (m_loadThread.isAllTaskFinished())
+	if (m_isInit)
 	{
 		pushImagePathToLoad(15);
+		m_isInit = false;
 	}
 }
 
 void CWaterFallWidget::setImageList(const QStringList& listImagePath)
 {
+	m_isInit = true;
 	releaseItems();
 	//m_loadThread.stopAndClear();
 	//m_loadThread.start();
@@ -88,11 +91,11 @@ void CWaterFallWidget::releaseItems()
 	}
 }
 
-void CWaterFallWidget::onImageLoaded(const QString& taskID, bool success, const QImage& image, const ImageLib::stReadParam& param)
+void CWaterFallWidget::onImageLoaded(const QString& taskID, bool success, const QImage& image)
 {
 	if (!image.isNull())
 	{
-		CWaterFallItem* item = new CWaterFallItem(QPixmap::fromImage(image), param.fileUrl, this);
+		CWaterFallItem* item = new CWaterFallItem(QPixmap::fromImage(image), QUrl(), this);
 
 		appendItem(item);
 	}
@@ -255,7 +258,7 @@ void CWaterFallWidget::tryToDumpTopItem(int size)
 
 void CWaterFallWidget::onScrollToTop(int scrollareaHeight)
 {
-	tryToDumpBottomItem(scrollareaHeight * 2.5);
+	tryToDumpBottomItem(scrollareaHeight * 1.5);
 
 	update();
 }

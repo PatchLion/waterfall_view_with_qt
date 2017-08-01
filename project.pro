@@ -7,11 +7,11 @@ QT += core gui widgets network
 CONFIG += c++11
 
 include(public.pri)
-
 INCLUDEPATH += . ImageLib/includes
 
-HEADERS += *.h ImageLib/includes/*.h
-SOURCES +=*.cpp ImageLib/sources/*.cpp
+LIBS += -LImageLib/$(Platform)/$(Configuration) -lImageLib
+HEADERS += *.h
+SOURCES +=*.cpp
 
 
 

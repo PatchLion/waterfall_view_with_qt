@@ -72,16 +72,20 @@ void CWaterFallItem::paintEvent(QPaintEvent *event)
 		painter.setFont(f);
 		QFontMetrics fontM(f);
 
-		QStringList temp = m_imageUrl.toString().split('/');
-		QString text = temp[temp.size() - 2];
-		const int kLimitSize = 12;
-		if (text.size() > kLimitSize)
+		if (!m_imageUrl.isEmpty())
 		{
-			text = text.mid(0, kLimitSize) + "...";
-		}
-		QRect textRect = fontM.boundingRect(text);
+			QStringList temp = m_imageUrl.toString().split('/');
+			QString text = temp[temp.size() - 2];
+			const int kLimitSize = 12;
+			if (text.size() > kLimitSize)
+			{
+				text = text.mid(0, kLimitSize) + "...";
+			}
+			QRect textRect = fontM.boundingRect(text);
 
-		painter.drawText(bgRect.center().x() - textRect.width() / 2.0, bgRect.center().y() + textRect.height()/3.0, text);
+			painter.drawText(bgRect.center().x() - textRect.width() / 2.0, bgRect.center().y() + textRect.height() / 3.0, text);
+		}
+		
 	}
 }
 
@@ -99,7 +103,7 @@ void CWaterFallItem::leaveEvent(QEvent *event)
 
 void CWaterFallItem::mousePressEvent(QMouseEvent *event)
 {
-	CImageItem imageItem(m_imageUrl, this);
+	CImageItem imageItem(m_imageUrl.toString(), m_imageUrl.isLocalFile(), this);
 	imageItem.showMaximized();
 	imageItem.exec();
 }

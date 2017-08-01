@@ -1,12 +1,12 @@
 #include "ImageItem.h"
 #include <QFontMetrics>
 
-CImageItem::CImageItem(const QUrl& url, QWidget* parent /*= 0*/)
+CImageItem::CImageItem(const QString& path, bool isLocalFile, QWidget* parent /*= 0*/)
 	: QDialog(parent)
 	, m_isLoading(true)
 	, m_scale(1.0)
 {
-	ImageLib::stReadParam param(url);
+	ImageLib::stReadParam param(path, isLocalFile);
 	m_imageLoadThread.setParam(param);
 	connect(&m_imageLoadThread, &QThread::finished, this, &CImageItem::onImageLoaded);
 

@@ -48,7 +48,7 @@ protected:
 	void tryToDumpTopItem(int size);
 	void tryToDumpBottomItem(int size);
 protected Q_SLOTS:
-void onImageLoaded(const QString& taskID, bool success, const QImage& image, const ImageLib::stReadParam& param);
+void onImageLoaded(const QString& taskID, bool success, const QImage& image);
 
 private:
 	QStringList m_listImagePath;
@@ -56,6 +56,7 @@ private:
 	int m_heights[kColumnSize]; //
 	QList<CWaterFallItem*> m_listItemsWithColumn[kColumnSize];
 	//QList<CWaterFallItem*> m_listItem;
+	bool m_isInit;
 };
 
 

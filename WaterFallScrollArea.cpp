@@ -14,7 +14,7 @@ CWaterFallScrollArea::CWaterFallScrollArea(QWidget* parant /*= 0*/)
 	connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &CWaterFallScrollArea::onVerticalBarRangeChanged);
 	connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &CWaterFallScrollArea::onVerticalBarValueChanged);
 
-	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	//setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	setAcceptDrops(true);
@@ -23,7 +23,7 @@ CWaterFallScrollArea::CWaterFallScrollArea(QWidget* parant /*= 0*/)
 void CWaterFallScrollArea::resizeEvent(QResizeEvent *event)
 {
 	Q_ASSERT(m_content);
-	m_content->setFixedWidth(width()-2);
+	m_content->setFixedWidth(width()-20);
 	m_content->setFixedHeight(height() + 100);
 }
 
