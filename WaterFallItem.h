@@ -10,13 +10,13 @@ class CWaterFallItem : public QWidget
 
 	friend class CWaterFallWidget;
 public:
-	CWaterFallItem(const QPixmap& thumb, const QString& path, QWidget* parent = 0);
+	CWaterFallItem(const QPixmap& thumb, const QUrl& path, QWidget* parent = 0);
 	~CWaterFallItem();
 
 public:
 	QSize imageSize() const{ return m_size; }
-	void setThumb(const QPixmap& thumb, const QString& path);
-	QString originImagePath() const;
+	void setThumb(const QPixmap& thumb, const QUrl& url);
+	QUrl imageUrl() const;
 	QPixmap thumb() const { return m_thumb; }
 
 	void dump();
@@ -30,7 +30,7 @@ private:
 	QSize m_size;
 	bool m_isDumped;
 	QString m_dumpedPath;
-	QString m_originImagePath;
+	QUrl m_imageUrl;
 	QPixmap m_thumb;
 	bool m_isHovering;
 };

@@ -3,7 +3,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include "ImageLoadThreadManager.h"
+#include "ImageReadQueue.h"
 
 #define kColumnSize 4 
 
@@ -21,6 +21,7 @@ public:
 	~CWaterFallWidget();
 
 public:
+	void appendImageList(const QStringList& listImagePath);
 	void setImageList(const QStringList& listImagePath);
 	static QSize fixedSizeWithWidth(const QSize& imageSize, int width);
 
@@ -33,7 +34,7 @@ private:
 protected:
 	void paintEvent(QPaintEvent *event);
 
-	void pushImagePathToLoad(int count = 8);
+	void pushImagePathToLoad(int count = 15);
 
 	void refreshItems();
 	void appendItem(CWaterFallItem* item);
@@ -47,14 +48,15 @@ protected:
 	void tryToDumpTopItem(int size);
 	void tryToDumpBottomItem(int size);
 protected Q_SLOTS:
-	void onImageLoaded(const QPixmap& image, const QString& originpath);
+void onImageLoaded(const QString& taskID, bool success, const QImage& image);
 
 private:
 	QStringList m_listImagePath;
-	CImageLoadThreadManager m_loadThread;
+	ImageLib::CImageReadQueue m_loadThread;
 	int m_heights[kColumnSize]; //
 	QList<CWaterFallItem*> m_listItemsWithColumn[kColumnSize];
 	//QList<CWaterFallItem*> m_listItem;
+	bool m_isInit;
 };
 
 

@@ -5,6 +5,7 @@
 CWaterFallScrollArea::CWaterFallScrollArea(QWidget* parant /*= 0*/)
 	: QScrollArea(parant)
 	, m_content(0)
+	, m_sreachThread(0)
 {
 	m_content = new CWaterFallWidget;
 	m_content->setFixedHeight(30);
@@ -13,7 +14,7 @@ CWaterFallScrollArea::CWaterFallScrollArea(QWidget* parant /*= 0*/)
 	connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &CWaterFallScrollArea::onVerticalBarRangeChanged);
 	connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &CWaterFallScrollArea::onVerticalBarValueChanged);
 
-	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	//setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	setAcceptDrops(true);
@@ -22,7 +23,7 @@ CWaterFallScrollArea::CWaterFallScrollArea(QWidget* parant /*= 0*/)
 void CWaterFallScrollArea::resizeEvent(QResizeEvent *event)
 {
 	Q_ASSERT(m_content);
-	m_content->setFixedWidth(width()-2);
+	m_content->setFixedWidth(width()-20);
 	m_content->setFixedHeight(height() + 100);
 }
 
@@ -52,6 +53,12 @@ void CWaterFallScrollArea::setImageList(const QStringList& listImagePath)
 	m_content->setImageList(listImagePath);
 }
 
+void CWaterFallScrollArea::appendImageList(const QStringList& listImagePath)
+{
+	Q_ASSERT(m_content);
+	m_content->appendImageList(listImagePath);
+}
+
 void CWaterFallScrollArea::dropEvent(QDropEvent *event)
 {
 	setEnabled(false);
@@ -65,25 +72,42 @@ void CWaterFallScrollArea::dropEvent(QDropEvent *event)
 			{
 				if (urls[i].isLocalFile())
 				{
-					QEventLoop loop;
-					CImageSreachThread sreachThread;
-					connect(&sreachThread, &CImageSreachThread::finished, &loop, &QEventLoop::quit);
-					sreachThread.setRootPath(urls[i].toLocalFile());
-					sreachThread.start();
-					loop.exec();
-
-					paths.append(sreachThread.fileList());
+					paths << urls[i].toLocalFile();
 				}
 			}
 
-			setImageList(paths);
+
+			if (!paths.isEmpty())
+			{
+				if (!m_sreachThread)
+				{
+					m_sreachThread = new CImageSreachThread(this);
+				}
+
+				m_sreachThread->setRootPaths(paths);
+
+				connect(m_sreachThread, &CImageSreachThread::finished, this, &CWaterFallScrollArea::onImageAllLoadFinished);
+				connect(m_sreachThread, &CImageSreachThread::readProgress, this, &CWaterFallScrollArea::onImageLoadProgress);
+
+				m_sreachThread->start();
+			}
 		}
 	}
-	setEnabled(true);
 }
 
 void CWaterFallScrollArea::dragEnterEvent(QDragEnterEvent *event)
 {
 	event->accept();
+}
+
+void CWaterFallScrollArea::onImageAllLoadFinished()
+{
+	setEnabled(true);
+}
+
+void CWaterFallScrollArea::onImageLoadProgress(const QStringList& listFile)
+{
+	setEnabled(true);
+	appendImageList(listFile);
 }
 
