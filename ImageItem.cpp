@@ -5,7 +5,7 @@ CImageItem::CImageItem(const QUrl& url, QWidget* parent /*= 0*/)
 	: QDialog(parent)
 	, m_isLoading(true)
 {
-	ImageLib::stReadParam param(url);
+    ImageLib::stReadParam param(url.toLocalFile());
 	m_imageLoadThread.setParam(param);
 	connect(&m_imageLoadThread, &QThread::finished, this, &CImageItem::onImageLoaded);
 
